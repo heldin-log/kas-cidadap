@@ -20,5 +20,9 @@ export function middleware(request: NextRequest) {
 
 // Pastikan /dashboard dan sub-foldernya terdaftar di matcher
 export const config = {
-  matcher: ['/dashboard/:path*', '/transactions/:path*', '/users/:path*', '/login', '/'],
+  matcher: [
+    '/dashboard/:path*', 
+    '/transactions/:path*', 
+    '/users/:path*'
+  ],
 };
