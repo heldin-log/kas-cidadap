@@ -4,15 +4,23 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date
+import os
 
 import models
 from database import engine, get_db
 
 app = FastAPI(title="API Manajemen Kas - Modul User", version="1.0")
 
+# Gunakan origin eksplisit agar preflight CORS valid di production.
+raw_origins = os.getenv(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:3000,https://kas-cidadap.vercel.app",
+)
+allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Mengizinkan semua origin (untuk development lokal)
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],  # Mengizinkan semua method (GET, POST, PUT, DELETE, dll)
     allow_headers=["*"],  # Mengizinkan semua header
