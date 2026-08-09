@@ -26,8 +26,10 @@ export default function TransactionsPage() {
 
   // Form State
   const getTodayDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+    // Hindari UTC shift dari toISOString() agar default date selalu sesuai tanggal lokal.
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+    return local.toISOString().split("T")[0];
   };
 
   const [title, setTitle] = useState("");
@@ -139,6 +141,13 @@ export default function TransactionsPage() {
   const formatDateDisplay = (dateString: string) => {
     if (!dateString) return "-";
     const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short', year: 'numeric' };
+
+    // Jika format YYYY-MM-DD, parse manual supaya tidak bergeser karena timezone.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(year, month - 1, day).toLocaleDateString("id-ID", options);
+    }
+
     return new Date(dateString).toLocaleDateString('id-ID', options);
   };
 
