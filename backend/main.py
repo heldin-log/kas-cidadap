@@ -5,11 +5,13 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import date
 import os
+import logging
 
 import models
 from database import engine, get_db
 
 app = FastAPI(title="API Manajemen Kas - Modul User", version="1.0")
+logger = logging.getLogger("uvicorn.error")
 
 # Gunakan origin eksplisit agar preflight CORS valid di production.
 raw_origins = os.getenv(
@@ -47,8 +49,12 @@ def create_default_admin():
 # Event startup FastAPI untuk inisialisasi database dan akun default
 @app.on_event("startup")
 def startup_event():
-    models.Base.metadata.create_all(bind=engine)
-    create_default_admin()
+    try:
+        models.Base.metadata.create_all(bind=engine)
+        create_default_admin()
+    except Exception:
+        # Jangan matikan proses aplikasi agar service tetap up dan error terlihat di log.
+        logger.exception("Gagal inisialisasi database saat startup")
 
 # Skema data masuk untuk tambah user
 class UserCreate(BaseModel):
@@ -73,6 +79,10 @@ class TransactionCreate(BaseModel):
 
 class LoginRequest(BaseModel):
     password: str
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 @app.post("/login/")
 def login(request: LoginRequest, db: Session = Depends(get_db)):
