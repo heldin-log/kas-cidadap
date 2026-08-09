@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, PlusCircle, Users, Search, X, Sparkles, AlertTriangle, Phone, Shield, Edit3, Lock } from "lucide-react";
 import { toast } from "sonner";
 import Pagination from 'rc-pagination';
+import { API_URL } from "@/config";
 
 interface User {
   id: number;
@@ -45,7 +46,7 @@ export default function UsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/users/");
+      const res = await fetch(`${API_URL}/users/`);
       const data = await res.json();
       setUsers(data.sort((a: User, b: User) => b.id - a.id));
     } catch (error) {
@@ -63,7 +64,7 @@ export default function UsersPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://127.0.0.1:8000/users/", {
+      const res = await fetch(`${API_URL}/users/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, phone, password, role }),
@@ -103,7 +104,7 @@ export default function UsersPage() {
     if (!editUserId) return;
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/users/${editUserId}`, {
+      const res = await fetch(`${API_URL}/users/${editUserId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: editName, phone: editPhone, password: editPassword, role: editRole }),
@@ -126,7 +127,7 @@ export default function UsersPage() {
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/users/${deleteTargetId}`, {
+      const res = await fetch(`${API_URL}/users/${deleteTargetId}`, {
         method: "DELETE",
       });
       if (res.ok) {

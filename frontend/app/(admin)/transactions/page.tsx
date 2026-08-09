@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, PlusCircle, WalletCards, ArrowUpRight, ArrowDownLeft, Search, Filter, X, Sparkles, AlertTriangle, TrendingUp, TrendingDown, Calendar, Clock } from "lucide-react";
 import { toast } from "sonner";
 import Pagination from 'rc-pagination';
+import { API_URL } from "@/config";
 
 interface Transaction {
   id: number;
@@ -39,8 +40,8 @@ export default function TransactionsPage() {
   const itemsPerPage = 10;
 
   const fetchTransactions = async () => {
-    try {
-      const res = await fetch("http://127.0.0.1:8000/transactions/");
+        try {
+          const res = await fetch(`${API_URL}/transactions/`);
       const data = await res.json();
       setTransactions(data.sort((a: Transaction, b: Transaction) => b.id - a.id));
     } catch (error) {
@@ -57,7 +58,7 @@ export default function TransactionsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://127.0.0.1:8000/transactions/", {
+      const res = await fetch(`${API_URL}/transactions/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, amount: parseFloat(amount), type, date }),
@@ -83,7 +84,7 @@ export default function TransactionsPage() {
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/transactions/${deleteTargetId}`, {
+      const res = await fetch(`${API_URL}/transactions/${deleteTargetId}`, {
         method: "DELETE",
       });
       if (res.ok) {

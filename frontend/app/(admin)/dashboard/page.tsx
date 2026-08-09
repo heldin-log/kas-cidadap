@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { WalletCards, TrendingUp, Users, ArrowUpRight, ArrowDownRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { API_URL } from "@/config";
 
 interface Transaction {
   id: number;
@@ -28,8 +29,8 @@ export default function DashboardPage() {
     const fetchData = async () => {
       try {
         const [resTx, resUser] = await Promise.all([
-          fetch("http://127.0.0.1:8000/transactions/"),
-          fetch("http://127.0.0.1:8000/users/")
+          fetch(`${API_URL}/transactions/`),
+          fetch(`${API_URL}/users/`)
         ]);
         
         const txData = await resTx.json();
