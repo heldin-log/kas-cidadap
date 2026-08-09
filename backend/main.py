@@ -12,10 +12,10 @@ app = FastAPI(title="API Manajemen Kas - Modul User", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://kas-cidadap.vercel.app", "http://localhost:3000"],
+    allow_origins=["*"],  # Mengizinkan semua origin (untuk development lokal)
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Mengizinkan semua method (GET, POST, PUT, DELETE, dll)
+    allow_headers=["*"],  # Mengizinkan semua header
 )
 
 # Fungsi untuk membuat admin default otomatis saat aplikasi pertama kali dinyalakan
