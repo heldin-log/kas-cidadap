@@ -24,7 +24,11 @@ class WhatsAppConfigRequest(BaseModel):
 
 app = FastAPI(title="API Manajemen Kas - Modul User", version="1.0")
 logger = logging.getLogger("uvicorn.error")
-BOT_SERVICE_URL = os.getenv("BOT_SERVICE_URL", "http://localhost:8080").rstrip("/")
+BOT_SERVICE_URL = (
+    os.getenv("BOT_SERVICE_URL")
+    or os.getenv("WHATSAPP_BOT_URL")
+    or "http://localhost:8080"
+).rstrip("/")
 
 # Gunakan origin eksplisit agar preflight CORS valid di production.
 raw_origins = os.getenv(
@@ -102,10 +106,36 @@ def health_check():
 def get_bot_info_proxy():
     try:
         response = requests.get(f"{BOT_SERVICE_URL}/bot-info", timeout=10)
+        if response.status_code >= 400:
+            raise HTTPException(
+                status_code=response.status_code,
+                detail=f"Bot service error ({response.status_code})",
+            )
         return response.json()
+    except HTTPException:
+        raise
     except Exception as e:
         logger.exception("Gagal mengambil status bot")
         raise HTTPException(status_code=502, detail=f"Bot service tidak terjangkau: {e}")
+
+@app.get("/api/whatsapp/bot-health")
+def get_bot_health_proxy():
+    try:
+        response = requests.get(f"{BOT_SERVICE_URL}/bot-info", timeout=10)
+        payload = response.json() if response.headers.get("content-type", "").startswith("application/json") else {}
+        return {
+            "ok": response.status_code < 400,
+            "bot_service_url": BOT_SERVICE_URL,
+            "status_code": response.status_code,
+            "bot_status": payload.get("status"),
+            "has_qr": bool(payload.get("qr")),
+        }
+    except Exception as e:
+        return {
+            "ok": False,
+            "bot_service_url": BOT_SERVICE_URL,
+            "error": str(e),
+        }
 
 @app.post("/api/whatsapp/reset-session")
 def reset_bot_session_proxy():

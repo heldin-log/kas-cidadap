@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, RefreshCw, Send, CheckCircle2, XCircle, Settings, QrCode, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import { API_URL } from '@/config';
@@ -17,13 +17,19 @@ export default function WhatsAppBotPage() {
   const [isResetting, setIsResetting] = useState<boolean>(false);
   const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
   const [messageTemplate, setMessageTemplate] = useState<string>('Memuat data rekap...');
+  const [botError, setBotError] = useState<string>('');
 
-  const checkBotInfo = async () => {
+  const checkBotInfo = useCallback(async () => {
     try {
       // 1. Ambil info bot & daftar grup melalui backend API
       const res = await fetch(`${API_URL}/api/whatsapp/bot-info`);
+      if (!res.ok) {
+        const errPayload = await res.json().catch(() => ({}));
+        throw new Error(errPayload.detail || `HTTP ${res.status}`);
+      }
       const data = await res.json();
       setBotStatus(data.status);
+      setBotError('');
 
       if (data.status === 'qr_ready') {
         setQrCodeData(data.qr);
@@ -54,16 +60,22 @@ export default function WhatsAppBotPage() {
           }
         }
       }
-    } catch (err) {
+    } catch (error) {
       setBotStatus('disconnected');
+      setQrCodeData('');
+      setBotError((error as Error).message || 'Gagal terhubung ke bot service');
     }
-  };
+  }, [targetGroup]);
 
   useEffect(() => {
-    checkBotInfo();
-    const interval = setInterval(checkBotInfo, 3000);
+    const pollBotInfo = () => {
+      void checkBotInfo();
+    };
+
+    pollBotInfo();
+    const interval = setInterval(pollBotInfo, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [checkBotInfo]);
 
   const handleResetSession = async () => {
     if (!confirm("Yakin ingin mengganti nomor? Bot akan offline dan meminta scan ulang.")) return;
@@ -76,7 +88,7 @@ export default function WhatsAppBotPage() {
         setQrCodeData('');
         checkBotInfo();
       }
-    } catch (err) {
+    } catch {
       toast.error("Gagal mereset sesi.");
     } finally {
       setIsResetting(false);
@@ -125,7 +137,7 @@ export default function WhatsAppBotPage() {
         body: JSON.stringify({ target: targetGroup, schedule: schedule }) // Kirim target & schedule
       });
       if (response.ok) toast.success('Pengaturan grup & tempo berhasil disimpan!');
-    } catch (error) {
+    } catch {
       toast.error('Gagal menyimpan pengaturan.');
     } finally {
       setIsLoading(false);
@@ -151,15 +163,16 @@ export default function WhatsAppBotPage() {
 
       const result = await response.json();
       toast.success(result.message || 'Pesan berhasil dikirim!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.dismiss();
       console.error(error);
-      toast.error(error.message || 'Gagal mengirim. Pastikan bot aktif.');
+      const message = error instanceof Error ? error.message : 'Gagal mengirim. Pastikan bot aktif.';
+      toast.error(message);
     }
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="w-full mx-auto space-y-6">
       {/* Header Halaman */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl shadow-xs border border-zinc-200/80">
         <div>
@@ -228,6 +241,11 @@ export default function WhatsAppBotPage() {
                 <p className="text-[10px] text-amber-600 font-medium">
                   Pastikan service Node.js bot (port 8080) sedang berjalan.
                 </p>
+                {botError ? (
+                  <p className="text-[10px] text-rose-600 font-medium wrap-break-word">
+                    Detail: {botError}
+                  </p>
+                ) : null}
               </div>
             )}
           </div>
