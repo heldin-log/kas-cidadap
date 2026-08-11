@@ -238,9 +238,9 @@ export default function WhatsAppBotPage() {
             ) : (
               <div className="py-4 space-y-2">
                 <p className="text-xs text-zinc-500 animate-pulse">Menghubungkan ke server bot...</p>
-                <p className="text-[10px] text-amber-600 font-medium">
+                {/* <p className="text-[10px] text-amber-600 font-medium">
                   Pastikan service Node.js bot (port 8080) sedang berjalan.
-                </p>
+                </p> */}
                 {botError ? (
                   <p className="text-[10px] text-rose-600 font-medium wrap-break-word">
                     Detail: {botError}
