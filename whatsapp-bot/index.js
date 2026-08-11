@@ -13,6 +13,7 @@ let cachedGroups = [];
 let lastFetchTime = 0;
 const CACHE_DURATION = 60 * 1000;
 const axios = require("axios");
+const BACKEND_URL = (process.env.BACKEND_URL || "http://localhost:8000").replace(/\/$/, "");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -49,7 +50,7 @@ async function connectToWhatsApp() {
       console.log(`Menerima perintah '#kas' dari: ${remoteJid}`);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/whatsapp-summary/",
+          `${BACKEND_URL}/api/whatsapp-summary/`,
         );
         await sock.sendMessage(
           remoteJid,
@@ -66,7 +67,7 @@ async function connectToWhatsApp() {
       console.log(`Menerima perintah '#pemasukan' dari: ${remoteJid}`);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/whatsapp-income/",
+          `${BACKEND_URL}/api/whatsapp-income/`,
         );
         await sock.sendMessage(
           remoteJid,
@@ -88,7 +89,7 @@ async function connectToWhatsApp() {
       console.log(`Menerima perintah '#pengeluaran' dari: ${remoteJid}`);
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/whatsapp-expense/",
+          `${BACKEND_URL}/api/whatsapp-expense/`,
         );
         await sock.sendMessage(
           remoteJid,
