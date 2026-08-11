@@ -1,0 +1,17 @@
+{
+  "name": "kas-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Microservice WhatsApp Bot untuk Kas Cidadap",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.0",
+    "axios": "^1.19.0",
+    "cors": "^2.8.6",
+    "express": "^4.19.2",
+    "pino": "^9.0.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

@@ -89,11 +89,12 @@ export default function LoginPage() {
           </div>
 
           <Button 
-            disabled={loading}
-            className="w-full h-11 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-600/20 text-xs transition-all transform hover:scale-[1.01] active:scale-95"
-          >
-            {loading ? "Memeriksa..." : "Masuk ke Sistem"}
-          </Button>
+  type="submit"
+  disabled={loading}
+  className="w-full h-11 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold rounded-2xl shadow-lg shadow-indigo-600/20 text-xs transition-all transform hover:scale-[1.01] active:scale-95"
+>
+  {loading ? "Memeriksa..." : "Masuk ke Sistem"}
+</Button>
         </form>
 
         <div className="pt-4 border-t border-zinc-100 flex items-center justify-center gap-2 text-[11px] text-zinc-400">

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Users, WalletCards, LayoutDashboard, Bell, Sparkles, Menu, X, LogOut } from "lucide-react";
+import { Users, WalletCards, LayoutDashboard, Bell, Sparkles, Menu, X, LogOut, MessageSquare } from "lucide-react"; // 1. Tambahkan MessageSquare di sini
 import { Toaster, toast } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
@@ -99,6 +99,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link href="/dashboard" className={linkClass("/dashboard")}><LayoutDashboard className="w-4.5 h-4.5" /> Dashboard Utama</Link>
               <Link href="/users" className={linkClass("/users")}><Users className="w-4.5 h-4.5" /> Manajemen Anggota</Link>
               <Link href="/transactions" className={linkClass("/transactions")}><WalletCards className="w-4.5 h-4.5" /> Jurnal Transaksi</Link>
+              {/* 2. Tambahkan Link menu WhatsApp Bot di bawah sini */}
+              <Link href="/whatsapp" className={linkClass("/whatsapp")}><MessageSquare className="w-4.5 h-4.5" /> WhatsApp Bot</Link>
             </nav>
           </div>
         </aside>
@@ -118,12 +120,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Tombol Notifikasi */}
-              {/* <button className="h-10 w-10 rounded-xl border border-zinc-200/80 bg-white flex items-center justify-center text-zinc-500 hover:text-zinc-950 hover:border-zinc-300 transition-all relative shadow-2xs group">
-                <Bell className="w-4.5 h-4.5 group-hover:rotate-12 transition-transform" />
-                <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-indigo-600 ring-2 ring-white"></span>
-              </button> */}
-
               {/* Profile Card di Header dengan Role Dinamis */}
               <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md border border-white/20 pl-2 pr-2 py-1 rounded-2xl shadow-sm hover:shadow-indigo-500/10 hover:shadow-lg transition-all duration-300 animate-in fade-in zoom-in-95 duration-300">
                 

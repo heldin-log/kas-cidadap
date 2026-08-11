@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from datetime import datetime
@@ -22,3 +23,11 @@ class Transaction(Base):
     type = Column(String, nullable=False)  # "income" atau "expense"
     date = Column(String, nullable=False)  # Tanggal manual dari form (format YYYY-MM-DD)
     created_at = Column(DateTime(timezone=True), server_default=func.now()) # Otomatis, tidak ditampilkan di tabel
+
+class WhatsAppConfig(Base):
+    __tablename__ = "whatsapp_configs"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    target_group_id = Column(String)
+    target_group_name = Column(String)
+    schedule_type = Column(String, default="daily") # Pilihan: 'daily', 'weekly', 'monthly', 'yearly'
