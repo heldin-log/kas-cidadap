@@ -24,6 +24,7 @@ class WhatsAppConfigRequest(BaseModel):
 
 app = FastAPI(title="API Manajemen Kas - Modul User", version="1.0")
 logger = logging.getLogger("uvicorn.error")
+BOT_SERVICE_URL = os.getenv("BOT_SERVICE_URL", "http://localhost:8080").rstrip("/")
 
 # Gunakan origin eksplisit agar preflight CORS valid di production.
 raw_origins = os.getenv(
@@ -96,6 +97,29 @@ class LoginRequest(BaseModel):
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/api/whatsapp/bot-info")
+def get_bot_info_proxy():
+    try:
+        response = requests.get(f"{BOT_SERVICE_URL}/bot-info", timeout=10)
+        return response.json()
+    except Exception as e:
+        logger.exception("Gagal mengambil status bot")
+        raise HTTPException(status_code=502, detail=f"Bot service tidak terjangkau: {e}")
+
+@app.post("/api/whatsapp/reset-session")
+def reset_bot_session_proxy():
+    try:
+        response = requests.post(f"{BOT_SERVICE_URL}/reset-session", timeout=15)
+        if response.status_code >= 400:
+            detail = response.json().get("message", "Gagal reset sesi bot")
+            raise HTTPException(status_code=response.status_code, detail=detail)
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("Gagal reset sesi bot")
+        raise HTTPException(status_code=502, detail=f"Bot service tidak terjangkau: {e}")
 
 @app.post("/login/")
 def login(request: LoginRequest, db: Session = Depends(get_db)):
@@ -255,7 +279,7 @@ def send_live_whatsapp(req: Optional[WhatsAppSendRequest] = None, db: Session = 
             "message": pesan
         }
         
-        response = requests.post("http://localhost:8080/send-message", json=bot_payload)
+        response = requests.post(f"{BOT_SERVICE_URL}/send-message", json=bot_payload, timeout=15)
         
         if response.status_code != 200:
             error_detail = response.json().get("message", "Gagal mengirim via bot")
@@ -314,7 +338,7 @@ def execute_send_whatsapp_logic(db: Session):
         "message": pesan
     }
     
-    response = requests.post("http://localhost:8080/send-message", json=bot_payload)
+    response = requests.post(f"{BOT_SERVICE_URL}/send-message", json=bot_payload, timeout=15)
     if response.status_code != 200:
         error_detail = response.json().get("message", "Gagal mengirim via bot")
         raise Exception(error_detail)

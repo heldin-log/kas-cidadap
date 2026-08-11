@@ -20,8 +20,8 @@ export default function WhatsAppBotPage() {
 
   const checkBotInfo = async () => {
     try {
-      // 1. Ambil info bot & daftar grup dari port 8080
-      const res = await fetch('http://localhost:8080/bot-info');
+      // 1. Ambil info bot & daftar grup melalui backend API
+      const res = await fetch(`${API_URL}/api/whatsapp/bot-info`);
       const data = await res.json();
       setBotStatus(data.status);
 
@@ -69,7 +69,7 @@ export default function WhatsAppBotPage() {
     if (!confirm("Yakin ingin mengganti nomor? Bot akan offline dan meminta scan ulang.")) return;
     setIsResetting(true);
     try {
-      const res = await fetch('http://localhost:8080/reset-session', { method: 'POST' });
+      const res = await fetch(`${API_URL}/api/whatsapp/reset-session`, { method: 'POST' });
       if (res.ok) {
         toast.success("Sesi berhasil direset.");
         setBotStatus('disconnected');
